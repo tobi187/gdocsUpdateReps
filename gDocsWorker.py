@@ -1,4 +1,3 @@
-import openpyxl as px
 import xl_model
 import pandas as pd
 import gspread
