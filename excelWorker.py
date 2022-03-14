@@ -10,7 +10,7 @@ ex = ex.fillna("noVal")
 #
 # for row in ex[["Händler-Info2"]].to_numpy()[10:20]:
 #     if row[0] == "noVal":
-#         continue
 #     print(row[0])
+#         continue
 
 print(ex.iloc[19]["Händler-Info2"])

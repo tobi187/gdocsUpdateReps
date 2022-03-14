@@ -54,16 +54,13 @@ class GDocsModel:
     StartRow: str  # 10
     StartCol: str  # A
     EndCol: str  # E
-    EndRow: str  # TODO: new Row (last entry + 1)
+    EndRow: str  # (last entry + 1)
 
     def get_range(self, end_y) -> str:
-        return f"{self.StartCol + self.start_row_update()}:{self.EndCol + str(end_y)}"
-
-    def start_row_update(self) -> str:
-        return str(int(self.EndRow) + 1)
+        return f"{self.StartCol + self.EndRow}:{self.EndCol + str(end_y)}"
 
     def link_range(self, length) -> str:
-        start_index = self.start_row_update()
+        start_index = self.EndRow
         end = start_index + length
         return f"O{start_index}:O{end}"
 
