@@ -1,7 +1,6 @@
 import xl_model
 import pandas as pd
 import gspread
-from sampleData import sData
 from xl_model import ExToCompare, GDocsModel
 
 gc = gspread.oauth()
@@ -13,12 +12,12 @@ def get_data() -> tuple[list[ExToCompare], GDocsModel]:
         WSName="Potentielle Kunden DE",
         StartRow="9",
         StartCol="A",
-        EndRow="E",
-        EndCol=""
+        EndRow="",
+        EndCol="E"
     )
 
     file = gc.open_by_key(doc.DocName)
-    ws = file.get_worksheet(doc.WSName)
+    ws = file.worksheet(doc.WSName)
     df = pd.DataFrame(ws.get_values())
     important_data = []
     end_index = 9
@@ -42,7 +41,7 @@ def update_gdocs(data: list[xl_model.ExcelModel], doc: xl_model.GDocsModel):
     data_correct = [d.to_upload_format() for d in data]
 
     file = gc.open_by_key(doc.DocName)
-    ws = file.get_worksheet(doc.WSName)
+    ws = file.worksheet(doc.WSName)
     ws.update(doc.get_range(len(data_correct)), data_correct)
 
     # update links
@@ -57,8 +56,11 @@ def update_gdocs(data: list[xl_model.ExcelModel], doc: xl_model.GDocsModel):
 
 def backup_service():
     file = gc.open_by_key("1RPZ81nHBtbSvuNCE3gtCa4Fc-KRBelhyYxtKVcaKpro")
-    backup_ws = file.get_worksheet("Potentielle Kunden DE Backup")
-    file.del_worksheet(backup_ws)
-    ws = file.get_worksheet("Potentielle Kunden DE")
-    ws.duplicate(new_sheet_name="Potentielle Kunden DE Backup")
+    sheet_names: list[gspread.Worksheet] = file.worksheets()
+    titles = [t.title for t in sheet_names]
+    if "Potentielle Kunden DE Backup" in titles:
+        backup_ws = file.worksheet("Potentielle Kunden DE Backup")
+        file.del_worksheet(backup_ws)
+    ws = file.worksheet("Potentielle Kunden DE")
+    ws.duplicate(new_sheet_name="Potentielle Kunden DE Backup", insert_sheet_index=len(titles))
 

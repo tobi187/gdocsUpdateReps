@@ -3,6 +3,13 @@ import enum
 import unicodedata
 
 
+class Status(enum.Enum):
+    Untested = 0,
+    IsCopy = 1
+    IsUnique = 2,
+    NotSure = 3
+
+
 @dataclasses.dataclass
 class ExcelModel:
     # All Rows from left to right in Excel starting at 1 (0), data starts at Col 10
@@ -46,6 +53,12 @@ class ExToCompare:
         self.Unternehmen = self.Unternehmen.strip()
         self.Telefon = self.Telefon.strip()
 
+    def email_part(self) -> str:
+        mail = self.eMail.replace(".", "@")
+        mail = mail.split("@")
+        if len(mail) > 1:
+            return mail[1]
+
 
 @dataclasses.dataclass
 class GDocsModel:
@@ -57,16 +70,13 @@ class GDocsModel:
     EndRow: str  # (last entry + 1)
 
     def get_range(self, end_y) -> str:
-        return f"{self.StartCol + self.EndRow}:{self.EndCol + str(end_y)}"
+        end = end_y + int(self.EndRow)
+        return f"{self.StartCol + self.EndRow}:{self.EndCol + str(end)}"
 
     def link_range(self, length) -> str:
-        start_index = self.EndRow
-        end = start_index + length
-        return f"O{start_index}:O{end}"
+        end = int(self.EndRow) + length
+        return f"O{self.EndRow}:O{str(end)}"
 
 
-class Status(enum.Enum):
-    Untested = 0,
-    IsCopy = 1
-    IsUnique = 2,
-    NotSure = 3
+
+
