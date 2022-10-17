@@ -2,7 +2,7 @@ import pandas as pd
 from xl_model import ExcelModel, Status
 
 
-def convert_row(bus_name, bus_info, link) -> ExcelModel:
+def convert_row(bus_name, bus_info, link, money) -> ExcelModel:
     company_name = bus_name.split("\n")[0]
     info = {"Business Name:": "", "Number:": "", "Business Address:": ""}
     col_names = ["Business Name:", "Type:", "RegNum:", "Number:", "Business Address:", "Representative Name:", "VAT Number:", "number:", "Customer Services Address:"]
@@ -23,13 +23,20 @@ def convert_row(bus_name, bus_info, link) -> ExcelModel:
         Adresse=info["Business Address:"],
         eMail="",
         Link=link.strip(),
+        Umsatz=money,
         Status=Status.Untested
     )
 
 
+def convert_money(amount: str):
+    # input fe. "249.044 €"
+    amount = amount.strip(".")[:-1]
+    float(amount)
+
+
 def get_data(path: str) -> list[ExcelModel]:
-    excel_data = pd.read_excel(path, sheet_name="Sheet1")
-    needed_colnames = ["Händler-Info1", "Händler-Info2", "Land", "Schaufenster-link-href"]
+    excel_data = pd.read_excel(path, sheet_name="Tabelle1")
+    needed_colnames = ["Händler-Info1", "Händler-Info2", "Land", "Schaufenster-link-href", "Total Revenues"]
     clean_data = []
     for entry in excel_data[needed_colnames].to_numpy():
         if entry[1] == "":
@@ -37,7 +44,7 @@ def get_data(path: str) -> list[ExcelModel]:
         if str(entry[2]).strip() != "DE":
             continue
 
-        c_row = convert_row(entry[0], entry[1], entry[3])
+        c_row = convert_row(entry[0], entry[1], entry[3], entry[4])
         clean_data.append(c_row)
 
     return clean_data

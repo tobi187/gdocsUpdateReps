@@ -19,6 +19,7 @@ class ExcelModel:
     eMail: str
     Adresse: str
     Link: str  # Col 15
+    Umsatz: str
     Status: Status
 
     def to_upload_format(self) -> list[str]:
